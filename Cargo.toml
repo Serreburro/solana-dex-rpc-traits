@@ -1,0 +1,12 @@
+[package]
+name = "solana-dex-rpc-traits"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+solana-client = "3.1.10"
+solana-account = "3.4.0"
+solana-pubkey = "3.0.0"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
