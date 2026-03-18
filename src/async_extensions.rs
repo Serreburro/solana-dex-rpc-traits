@@ -901,6 +901,14 @@ pub trait DexRpcClientAsyncExt {
             base_mint,
             quote_mint,
         );
+        let spot_only_reverse = self.get_pools_by_token_offsets(
+            FUTARCHY_AMM_PROGRAM_ID,
+            vec![memcmp_bytes(&DISC_FUTARCHY_BYTES)],
+            FUTARCHY_SPOT_BASE_MINT_OFFSET,
+            FUTARCHY_SPOT_QUOTE_MINT_OFFSET,
+            quote_mint,
+            base_mint,
+        );
         let futarchy_layout = self.get_pools_by_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_FUTARCHY_BYTES)],
@@ -909,9 +917,19 @@ pub trait DexRpcClientAsyncExt {
             base_mint,
             quote_mint,
         );
+        let futarchy_layout_reverse = self.get_pools_by_token_offsets(
+            FUTARCHY_AMM_PROGRAM_ID,
+            vec![memcmp_bytes(&DISC_FUTARCHY_BYTES)],
+            FUTARCHY_LAYOUT_BASE_MINT_OFFSET,
+            FUTARCHY_LAYOUT_QUOTE_MINT_OFFSET,
+            quote_mint,
+            base_mint,
+        );
         Box::pin(async move {
             let mut pools = spot_only.await?;
+            pools.extend(spot_only_reverse.await?);
             pools.extend(futarchy_layout.await?);
+            pools.extend(futarchy_layout_reverse.await?);
             Ok(pools)
         })
     }
