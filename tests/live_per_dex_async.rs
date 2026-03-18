@@ -23,7 +23,7 @@ fn pubkey(input: &str) -> Pubkey {
 #[ignore]
 async fn orca_bidirectional_live() {
     let pools = client()
-        .get_all_orca_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_orca_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("orca bidirectional: {}", pools.len());
@@ -34,7 +34,7 @@ async fn orca_bidirectional_live() {
 #[ignore]
 async fn orca_single_token_live() {
     let pools = client()
-        .get_all_orca_amm_pools_by_token(&pubkey(USDC))
+        .get_all_orca_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("orca single token: {}", pools.len());
@@ -45,7 +45,7 @@ async fn orca_single_token_live() {
 #[ignore]
 async fn meteora_dlmm_bidirectional_live() {
     let pools = client()
-        .get_all_meteora_dlmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_meteora_dlmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("meteora_dlmm bidirectional: {}", pools.len());
@@ -56,7 +56,7 @@ async fn meteora_dlmm_bidirectional_live() {
 #[ignore]
 async fn meteora_dlmm_single_token_live() {
     let pools = client()
-        .get_all_meteora_dlmm_amm_pools_by_token(&pubkey(USDC))
+        .get_all_meteora_dlmm_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("meteora_dlmm single token: {}", pools.len());
@@ -67,7 +67,7 @@ async fn meteora_dlmm_single_token_live() {
 #[ignore]
 async fn meteora_damm_v2_bidirectional_live() {
     let pools = client()
-        .get_all_meteora_damm_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_meteora_damm_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("meteora_damm_v2 bidirectional: {}", pools.len());
@@ -78,7 +78,7 @@ async fn meteora_damm_v2_bidirectional_live() {
 #[ignore]
 async fn meteora_damm_v2_single_token_live() {
     let pools = client()
-        .get_all_meteora_damm_v2_amm_pools_by_token(&pubkey(USDC))
+        .get_all_meteora_damm_v2_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("meteora_damm_v2 single token: {}", pools.len());
@@ -89,7 +89,7 @@ async fn meteora_damm_v2_single_token_live() {
 #[ignore]
 async fn meteora_damm_v1_bidirectional_live() {
     let pools = client()
-        .get_all_meteora_damm_v1_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_meteora_damm_v1_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("meteora_damm_v1 bidirectional: {}", pools.len());
@@ -100,7 +100,7 @@ async fn meteora_damm_v1_bidirectional_live() {
 #[ignore]
 async fn meteora_damm_v1_single_token_live() {
     let pools = client()
-        .get_all_meteora_damm_v1_amm_pools_by_token(&pubkey(USDC))
+        .get_all_meteora_damm_v1_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("meteora_damm_v1 single token: {}", pools.len());
@@ -111,7 +111,7 @@ async fn meteora_damm_v1_single_token_live() {
 #[ignore]
 async fn raydium_clmm_bidirectional_live() {
     let pools = client()
-        .get_all_raydium_clmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_raydium_clmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), true)
         .await
         .unwrap();
     println!("raydium_clmm bidirectional: {}", pools.len());
@@ -122,7 +122,7 @@ async fn raydium_clmm_bidirectional_live() {
 #[ignore]
 async fn raydium_clmm_single_token_live() {
     let pools = client()
-        .get_all_raydium_clmm_amm_pools_by_token(&pubkey(USDC))
+        .get_all_raydium_clmm_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("raydium_clmm single token: {}", pools.len());
@@ -133,7 +133,7 @@ async fn raydium_clmm_single_token_live() {
 #[ignore]
 async fn pancake_swap_bidirectional_live() {
     let pools = client()
-        .get_all_pancake_swap_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_pancake_swap_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("pancake_swap bidirectional: {}", pools.len());
@@ -144,7 +144,7 @@ async fn pancake_swap_bidirectional_live() {
 #[ignore]
 async fn pancake_swap_single_token_live() {
     let pools = client()
-        .get_all_pancake_swap_amm_pools_by_token(&pubkey(USDC))
+        .get_all_pancake_swap_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("pancake_swap single token: {}", pools.len());
@@ -155,7 +155,7 @@ async fn pancake_swap_single_token_live() {
 #[ignore]
 async fn byreal_bidirectional_live() {
     let pools = client()
-        .get_all_byreal_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_byreal_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("byreal bidirectional: {}", pools.len());
@@ -166,7 +166,7 @@ async fn byreal_bidirectional_live() {
 #[ignore]
 async fn byreal_single_token_live() {
     let pools = client()
-        .get_all_byreal_amm_pools_by_token(&pubkey(USDC))
+        .get_all_byreal_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("byreal single token: {}", pools.len());
@@ -177,7 +177,7 @@ async fn byreal_single_token_live() {
 #[ignore]
 async fn pumpfun_bidirectional_live() {
     let pools = client()
-        .get_all_pump_fun_amm_pools_by_tokens_bidirectional(&pubkey(random), &pubkey(WSOL))
+        .get_all_pump_fun_amm_pools_by_tokens_bidirectional(&pubkey(random), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("pumpfun bidirectional: {}", pools.len());
@@ -188,7 +188,7 @@ async fn pumpfun_bidirectional_live() {
 #[ignore]
 async fn pumpfun_single_token_live() {
     let pools = client()
-        .get_all_pump_fun_amm_pools_by_token(&pubkey(USDC))
+        .get_all_pump_fun_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("pumpfun single token: {}", pools.len());
@@ -199,7 +199,7 @@ async fn pumpfun_single_token_live() {
 #[ignore]
 async fn raydium_cpmm_bidirectional_live() {
     let pools = client()
-        .get_all_raydium_cpmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_raydium_cpmm_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("raydium_cpmm bidirectional: {}", pools.len());
@@ -210,7 +210,7 @@ async fn raydium_cpmm_bidirectional_live() {
 #[ignore]
 async fn raydium_cpmm_single_token_live() {
     let pools = client()
-        .get_all_raydium_cpmm_amm_pools_by_token(&pubkey(USDC))
+        .get_all_raydium_cpmm_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("raydium_cpmm single token: {}", pools.len());
@@ -221,7 +221,7 @@ async fn raydium_cpmm_single_token_live() {
 #[ignore]
 async fn raydium_amm_bidirectional_live() {
     let pools = client()
-        .get_all_raydium_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_raydium_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("raydium_amm bidirectional: {}", pools.len());
@@ -232,7 +232,7 @@ async fn raydium_amm_bidirectional_live() {
 #[ignore]
 async fn raydium_amm_single_token_live() {
     let pools = client()
-        .get_all_raydium_amm_pools_by_token(&pubkey(USDC))
+        .get_all_raydium_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("raydium_amm single token: {}", pools.len());
@@ -243,7 +243,7 @@ async fn raydium_amm_single_token_live() {
 #[ignore]
 async fn saros_bidirectional_live() {
     let pools = client()
-        .get_all_saros_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_saros_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("saros bidirectional: {}", pools.len());
@@ -254,7 +254,7 @@ async fn saros_bidirectional_live() {
 #[ignore]
 async fn saros_single_token_live() {
     let pools = client()
-        .get_all_saros_amm_pools_by_token(&pubkey(USDC))
+        .get_all_saros_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("saros single token: {}", pools.len());
@@ -265,7 +265,7 @@ async fn saros_single_token_live() {
 #[ignore]
 async fn orca_v2_bidirectional_live() {
     let pools = client()
-        .get_all_orca_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_orca_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("orca_v2 bidirectional: {}", pools.len());
@@ -276,7 +276,7 @@ async fn orca_v2_bidirectional_live() {
 #[ignore]
 async fn orca_v2_single_token_live() {
     let pools = client()
-        .get_all_orca_v2_amm_pools_by_token(&pubkey(USDC))
+        .get_all_orca_v2_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("orca_v2 single token: {}", pools.len());
@@ -287,7 +287,7 @@ async fn orca_v2_single_token_live() {
 #[ignore]
 async fn orca_v1_bidirectional_live() {
     let pools = client()
-        .get_all_orca_v1_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_orca_v1_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("orca_v1 bidirectional: {}", pools.len());
@@ -298,7 +298,7 @@ async fn orca_v1_bidirectional_live() {
 #[ignore]
 async fn orca_v1_single_token_live() {
     let pools = client()
-        .get_all_orca_v1_amm_pools_by_token(&pubkey(USDC))
+        .get_all_orca_v1_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("orca_v1 single token: {}", pools.len());
@@ -309,7 +309,7 @@ async fn orca_v1_single_token_live() {
 #[ignore]
 async fn stepn_bidirectional_live() {
     let pools = client()
-        .get_all_stepn_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_stepn_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("stepn bidirectional: {}", pools.len());
@@ -320,7 +320,7 @@ async fn stepn_bidirectional_live() {
 #[ignore]
 async fn stepn_single_token_live() {
     let pools = client()
-        .get_all_stepn_amm_pools_by_token(&pubkey(USDC))
+        .get_all_stepn_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("stepn single token: {}", pools.len());
@@ -331,7 +331,7 @@ async fn stepn_single_token_live() {
 #[ignore]
 async fn token_swap_bidirectional_live() {
     let pools = client()
-        .get_all_token_swap_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_token_swap_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("token_swap bidirectional: {}", pools.len());
@@ -342,7 +342,7 @@ async fn token_swap_bidirectional_live() {
 #[ignore]
 async fn token_swap_single_token_live() {
     let pools = client()
-        .get_all_token_swap_amm_pools_by_token(&pubkey(USDC))
+        .get_all_token_swap_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("token_swap single token: {}", pools.len());
@@ -353,7 +353,7 @@ async fn token_swap_single_token_live() {
 #[ignore]
 async fn penguin_bidirectional_live() {
     let pools = client()
-        .get_all_penguin_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_penguin_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("penguin bidirectional: {}", pools.len());
@@ -364,7 +364,7 @@ async fn penguin_bidirectional_live() {
 #[ignore]
 async fn penguin_single_token_live() {
     let pools = client()
-        .get_all_penguin_amm_pools_by_token(&pubkey(USDC))
+        .get_all_penguin_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("penguin single token: {}", pools.len());
@@ -375,7 +375,7 @@ async fn penguin_single_token_live() {
 #[ignore]
 async fn fusion_bidirectional_live() {
     let pools = client()
-        .get_all_fusion_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_fusion_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("fusion bidirectional: {}", pools.len());
@@ -386,7 +386,7 @@ async fn fusion_bidirectional_live() {
 #[ignore]
 async fn fusion_single_token_live() {
     let pools = client()
-        .get_all_fusion_amm_pools_by_token(&pubkey(USDC))
+        .get_all_fusion_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("fusion single token: {}", pools.len());
@@ -397,7 +397,7 @@ async fn fusion_single_token_live() {
 #[ignore]
 async fn obric_v2_bidirectional_live() {
     let pools = client()
-        .get_all_obric_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL))
+        .get_all_obric_v2_amm_pools_by_tokens_bidirectional(&pubkey(USDC), &pubkey(WSOL), false)
         .await
         .unwrap();
     println!("obric_v2 bidirectional: {}", pools.len());
@@ -408,7 +408,7 @@ async fn obric_v2_bidirectional_live() {
 #[ignore]
 async fn obric_v2_single_token_live() {
     let pools = client()
-        .get_all_obric_v2_amm_pools_by_token(&pubkey(USDC))
+        .get_all_obric_v2_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("obric_v2 single token: {}", pools.len());
@@ -421,7 +421,7 @@ async fn obric_v2_single_token_live() {
 async fn futarchy_bidirectional_live() {
     let solo_token = "SoLo9oxzLDpcq1dpqAgMwgce5WqkRDtNXK7EPnbmeta";
     let pools = client()
-        .get_all_futarchy_amm_pools_by_tokens(&pubkey(USDC), &pubkey(solo_token))
+        .get_all_futarchy_amm_pools_by_tokens(&pubkey(USDC), &pubkey(solo_token), false)
         .await
         .unwrap();
     println!("futarchy bidirectional: {}", pools.len());
@@ -432,7 +432,7 @@ async fn futarchy_bidirectional_live() {
 #[ignore]
 async fn futarchy_single_token_live() {
     let pools = client()
-        .get_all_futarchy_amm_pools_by_token(&pubkey(USDC))
+        .get_all_futarchy_amm_pools_by_token(&pubkey(USDC), false)
         .await
         .unwrap();
     println!("futarchy single token: {}", pools.len());

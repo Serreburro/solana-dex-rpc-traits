@@ -69,12 +69,12 @@ pub fn intersect_program_accounts(
         .collect()
 }
 
-pub fn pool_fetch_config(filters: Vec<RpcFilterType>) -> RpcProgramAccountsConfig {
+pub fn pool_fetch_config(filters: Vec<RpcFilterType>, zero_slice: bool) -> RpcProgramAccountsConfig {
     RpcProgramAccountsConfig {
         filters: Some(filters),
         account_config: RpcAccountInfoConfig {
             encoding: Some(UiAccountEncoding::Base64),
-            data_slice: None,
+            data_slice: zero_slice.then_some(solana_client::rpc_config::UiDataSliceConfig { offset: 0, length: 0 }),
             commitment: None,
             min_context_slot: None,
         },

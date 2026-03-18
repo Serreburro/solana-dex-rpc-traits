@@ -12,6 +12,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         program_id: Pubkey,
         filters: Vec<RpcFilterType>,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>>;
 
     fn get_pools_by_token_offsets(
@@ -22,10 +23,11 @@ pub trait DexRpcClientAsyncExt {
         mint_b_offset: usize,
         mint_a: &Pubkey,
         mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         let filters =
             with_token_pair_filters(base_filters, mint_a_offset, mint_b_offset, mint_a, mint_b);
-        self.get_all_pools_with_filters(program_id, filters)
+        self.get_all_pools_with_filters(program_id, filters, zero_slice)
     }
 
     fn get_pools_by_single_token_offset(
@@ -34,9 +36,10 @@ pub trait DexRpcClientAsyncExt {
         base_filters: Vec<RpcFilterType>,
         mint_offset: usize,
         mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         let filters = with_single_token_filter(base_filters, mint_offset, mint);
-        self.get_all_pools_with_filters(program_id, filters)
+        self.get_all_pools_with_filters(program_id, filters, zero_slice)
     }
 
     fn get_pools_by_token_offsets_bidirectional(
@@ -47,6 +50,7 @@ pub trait DexRpcClientAsyncExt {
         mint_b_offset: usize,
         mint_a: &Pubkey,
         mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         if mint_a == mint_b {
             return self.get_pools_by_token_offsets(
@@ -56,7 +60,8 @@ pub trait DexRpcClientAsyncExt {
                 mint_b_offset,
                 mint_a,
                 mint_b,
-            );
+            zero_slice,
+        );
         }
 
         let forward = self.get_pools_by_token_offsets(
@@ -66,6 +71,7 @@ pub trait DexRpcClientAsyncExt {
             mint_b_offset,
             mint_a,
             mint_b,
+            zero_slice,
         );
         let reverse = self.get_pools_by_token_offsets(
             program_id,
@@ -74,6 +80,7 @@ pub trait DexRpcClientAsyncExt {
             mint_b_offset,
             mint_b,
             mint_a,
+            zero_slice,
         );
         Box::pin(async move {
             let forward = forward.await?;
@@ -89,6 +96,7 @@ pub trait DexRpcClientAsyncExt {
         mint_a_offset: usize,
         mint_b_offset: usize,
         mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         if mint_a_offset == mint_b_offset {
             return self.get_pools_by_single_token_offset(
@@ -96,7 +104,8 @@ pub trait DexRpcClientAsyncExt {
                 base_filters,
                 mint_a_offset,
                 mint,
-            );
+            zero_slice,
+        );
         }
 
         let first = self.get_pools_by_single_token_offset(
@@ -104,9 +113,10 @@ pub trait DexRpcClientAsyncExt {
             base_filters.clone(),
             mint_a_offset,
             mint,
+            zero_slice,
         );
         let second =
-            self.get_pools_by_single_token_offset(program_id, base_filters, mint_b_offset, mint);
+            self.get_pools_by_single_token_offset(program_id, base_filters, mint_b_offset, mint, zero_slice);
         Box::pin(async move {
             let first = first.await?;
             let second = second.await?;
@@ -118,6 +128,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_a: &Pubkey,
         token_mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             ORCA_PROGRAM_ID,
@@ -126,6 +137,7 @@ pub trait DexRpcClientAsyncExt {
             ORCA_TOKEN_MINT_B_OFFSET,
             token_mint_a,
             token_mint_b,
+            zero_slice,
         )
     }
 
@@ -133,6 +145,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_a: &Pubkey,
         token_mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             ORCA_PROGRAM_ID,
@@ -141,12 +154,14 @@ pub trait DexRpcClientAsyncExt {
             ORCA_TOKEN_MINT_B_OFFSET,
             token_mint_a,
             token_mint_b,
+            zero_slice,
         )
     }
 
     fn get_all_orca_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             ORCA_PROGRAM_ID,
@@ -154,6 +169,7 @@ pub trait DexRpcClientAsyncExt {
             ORCA_TOKEN_MINT_A_OFFSET,
             ORCA_TOKEN_MINT_B_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -161,6 +177,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_x_mint: &Pubkey,
         token_y_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             METEORA_DLMM_PROGRAM_ID,
@@ -169,6 +186,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DLMM_TOKEN_Y_MINT_OFFSET,
             token_x_mint,
             token_y_mint,
+            zero_slice,
         )
     }
 
@@ -176,6 +194,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_x_mint: &Pubkey,
         token_y_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             METEORA_DLMM_PROGRAM_ID,
@@ -184,12 +203,14 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DLMM_TOKEN_Y_MINT_OFFSET,
             token_x_mint,
             token_y_mint,
+            zero_slice,
         )
     }
 
     fn get_all_meteora_dlmm_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             METEORA_DLMM_PROGRAM_ID,
@@ -197,6 +218,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DLMM_TOKEN_X_MINT_OFFSET,
             METEORA_DLMM_TOKEN_Y_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -204,6 +226,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             METEORA_DAMM_V2_PROGRAM_ID,
@@ -212,6 +235,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V2_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -219,6 +243,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             METEORA_DAMM_V2_PROGRAM_ID,
@@ -227,12 +252,14 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V2_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_meteora_damm_v2_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             METEORA_DAMM_V2_PROGRAM_ID,
@@ -240,6 +267,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V2_TOKEN_A_MINT_OFFSET,
             METEORA_DAMM_V2_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -247,6 +275,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             METEORA_DAMM_V1_PROGRAM_ID,
@@ -255,6 +284,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V1_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -262,6 +292,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             METEORA_DAMM_V1_PROGRAM_ID,
@@ -270,12 +301,14 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V1_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_meteora_damm_v1_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             METEORA_DAMM_V1_PROGRAM_ID,
@@ -283,6 +316,7 @@ pub trait DexRpcClientAsyncExt {
             METEORA_DAMM_V1_TOKEN_A_MINT_OFFSET,
             METEORA_DAMM_V1_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -290,6 +324,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             RAYDIUM_CLMM_PROGRAM_ID,
@@ -298,6 +333,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
@@ -305,6 +341,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             RAYDIUM_CLMM_PROGRAM_ID,
@@ -313,12 +350,14 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
     fn get_all_raydium_clmm_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             RAYDIUM_CLMM_PROGRAM_ID,
@@ -326,6 +365,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_0_OFFSET,
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -333,6 +373,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             PANCAKE_SWAP_PROGRAM_ID,
@@ -341,6 +382,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
@@ -348,6 +390,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             PANCAKE_SWAP_PROGRAM_ID,
@@ -356,12 +399,14 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
     fn get_all_pancake_swap_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             PANCAKE_SWAP_PROGRAM_ID,
@@ -369,6 +414,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_0_OFFSET,
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -376,6 +422,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             BYREAL_CLMM_PROGRAM_ID,
@@ -384,6 +431,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
@@ -391,6 +439,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_0: &Pubkey,
         token_mint_1: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             BYREAL_CLMM_PROGRAM_ID,
@@ -399,12 +448,14 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint_0,
             token_mint_1,
+            zero_slice,
         )
     }
 
     fn get_all_byreal_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             BYREAL_CLMM_PROGRAM_ID,
@@ -412,6 +463,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CLMM_TOKEN_MINT_0_OFFSET,
             RAYDIUM_CLMM_TOKEN_MINT_1_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -419,6 +471,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         base_mint: &Pubkey,
         quote_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             PUMPFUN_AMM_PROGRAM_ID,
@@ -427,6 +480,7 @@ pub trait DexRpcClientAsyncExt {
             PUMPFUN_AMM_QUOTE_MINT_OFFSET,
             base_mint,
             quote_mint,
+            zero_slice,
         )
     }
 
@@ -434,6 +488,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         base_mint: &Pubkey,
         quote_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             PUMPFUN_AMM_PROGRAM_ID,
@@ -442,12 +497,14 @@ pub trait DexRpcClientAsyncExt {
             PUMPFUN_AMM_QUOTE_MINT_OFFSET,
             base_mint,
             quote_mint,
+            zero_slice,
         )
     }
 
     fn get_all_pump_fun_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             PUMPFUN_AMM_PROGRAM_ID,
@@ -455,6 +512,7 @@ pub trait DexRpcClientAsyncExt {
             PUMPFUN_AMM_BASE_MINT_OFFSET,
             PUMPFUN_AMM_QUOTE_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -462,6 +520,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_0_mint: &Pubkey,
         token_1_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             RAYDIUM_CPMM_PROGRAM_ID,
@@ -470,6 +529,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CPMM_TOKEN_1_MINT_OFFSET,
             token_0_mint,
             token_1_mint,
+            zero_slice,
         )
     }
 
@@ -477,6 +537,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_0_mint: &Pubkey,
         token_1_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             RAYDIUM_CPMM_PROGRAM_ID,
@@ -485,12 +546,14 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CPMM_TOKEN_1_MINT_OFFSET,
             token_0_mint,
             token_1_mint,
+            zero_slice,
         )
     }
 
     fn get_all_raydium_cpmm_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             RAYDIUM_CPMM_PROGRAM_ID,
@@ -498,6 +561,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_CPMM_TOKEN_0_MINT_OFFSET,
             RAYDIUM_CPMM_TOKEN_1_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -505,6 +569,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         coin_vault_mint: &Pubkey,
         pc_vault_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             RAYDIUM_AMM_PROGRAM_ID,
@@ -513,6 +578,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_AMM_PC_VAULT_MINT_OFFSET,
             coin_vault_mint,
             pc_vault_mint,
+            zero_slice,
         )
     }
 
@@ -520,6 +586,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         coin_vault_mint: &Pubkey,
         pc_vault_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             RAYDIUM_AMM_PROGRAM_ID,
@@ -528,12 +595,14 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_AMM_PC_VAULT_MINT_OFFSET,
             coin_vault_mint,
             pc_vault_mint,
+            zero_slice,
         )
     }
 
     fn get_all_raydium_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             RAYDIUM_AMM_PROGRAM_ID,
@@ -541,6 +610,7 @@ pub trait DexRpcClientAsyncExt {
             RAYDIUM_AMM_COIN_VAULT_MINT_OFFSET,
             RAYDIUM_AMM_PC_VAULT_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -548,6 +618,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             SAROS_SWAP_PROGRAM_ID,
@@ -556,6 +627,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -563,6 +635,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             SAROS_SWAP_PROGRAM_ID,
@@ -571,12 +644,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_saros_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             SAROS_SWAP_PROGRAM_ID,
@@ -584,6 +659,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -591,6 +667,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             ORCA_V2_PROGRAM_ID,
@@ -599,6 +676,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -606,6 +684,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             ORCA_V2_PROGRAM_ID,
@@ -614,12 +693,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_orca_v2_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             ORCA_V2_PROGRAM_ID,
@@ -627,6 +708,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -634,6 +716,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             ORCA_V1_PROGRAM_ID,
@@ -642,6 +725,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -649,6 +733,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             ORCA_V1_PROGRAM_ID,
@@ -657,12 +742,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_orca_v1_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             ORCA_V1_PROGRAM_ID,
@@ -670,6 +757,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -677,6 +765,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             STEPN_PROGRAM_ID,
@@ -685,6 +774,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -692,6 +782,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             STEPN_PROGRAM_ID,
@@ -700,12 +791,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_stepn_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             STEPN_PROGRAM_ID,
@@ -713,6 +806,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -720,6 +814,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             TOKEN_SWAP_PROGRAM_ID,
@@ -728,6 +823,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -735,6 +831,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             TOKEN_SWAP_PROGRAM_ID,
@@ -743,12 +840,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_token_swap_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             TOKEN_SWAP_PROGRAM_ID,
@@ -756,6 +855,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -763,6 +863,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             PENGUIN_AMM_PROGRAM_ID,
@@ -771,6 +872,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
@@ -778,6 +880,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_a_mint: &Pubkey,
         token_b_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             PENGUIN_AMM_PROGRAM_ID,
@@ -786,12 +889,14 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_a_mint,
             token_b_mint,
+            zero_slice,
         )
     }
 
     fn get_all_penguin_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             PENGUIN_AMM_PROGRAM_ID,
@@ -799,6 +904,7 @@ pub trait DexRpcClientAsyncExt {
             TOKEN_SWAP_STYLE_TOKEN_A_MINT_OFFSET,
             TOKEN_SWAP_STYLE_TOKEN_B_MINT_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -806,6 +912,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_a: &Pubkey,
         token_mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             FUSION_PROGRAM_ID,
@@ -814,6 +921,7 @@ pub trait DexRpcClientAsyncExt {
             FUSION_TOKEN_MINT_B_OFFSET,
             token_mint_a,
             token_mint_b,
+            zero_slice,
         )
     }
 
@@ -821,6 +929,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         token_mint_a: &Pubkey,
         token_mint_b: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             FUSION_PROGRAM_ID,
@@ -829,12 +938,14 @@ pub trait DexRpcClientAsyncExt {
             FUSION_TOKEN_MINT_B_OFFSET,
             token_mint_a,
             token_mint_b,
+            zero_slice,
         )
     }
 
     fn get_all_fusion_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             FUSION_PROGRAM_ID,
@@ -842,6 +953,7 @@ pub trait DexRpcClientAsyncExt {
             FUSION_TOKEN_MINT_A_OFFSET,
             FUSION_TOKEN_MINT_B_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -849,6 +961,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         mint_x: &Pubkey,
         mint_y: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets(
             OBRIC_V2_PROGRAM_ID,
@@ -857,6 +970,7 @@ pub trait DexRpcClientAsyncExt {
             OBRIC_V2_MINT_Y_OFFSET,
             mint_x,
             mint_y,
+            zero_slice,
         )
     }
 
@@ -864,6 +978,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         mint_x: &Pubkey,
         mint_y: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_token_offsets_bidirectional(
             OBRIC_V2_PROGRAM_ID,
@@ -872,12 +987,14 @@ pub trait DexRpcClientAsyncExt {
             OBRIC_V2_MINT_Y_OFFSET,
             mint_x,
             mint_y,
+            zero_slice,
         )
     }
 
     fn get_all_obric_v2_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_pools_by_single_token_offsets(
             OBRIC_V2_PROGRAM_ID,
@@ -885,6 +1002,7 @@ pub trait DexRpcClientAsyncExt {
             OBRIC_V2_MINT_X_OFFSET,
             OBRIC_V2_MINT_Y_OFFSET,
             token_mint,
+            zero_slice,
         )
     }
 
@@ -892,6 +1010,7 @@ pub trait DexRpcClientAsyncExt {
         &self,
         base_mint: &Pubkey,
         quote_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         let spot_only = self.get_pools_by_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -900,6 +1019,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_SPOT_QUOTE_MINT_OFFSET,
             base_mint,
             quote_mint,
+            zero_slice,
         );
         let spot_only_reverse = self.get_pools_by_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -908,6 +1028,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_SPOT_QUOTE_MINT_OFFSET,
             quote_mint,
             base_mint,
+            zero_slice,
         );
         let futarchy_layout = self.get_pools_by_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -916,6 +1037,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_LAYOUT_QUOTE_MINT_OFFSET,
             base_mint,
             quote_mint,
+            zero_slice,
         );
         let futarchy_layout_reverse = self.get_pools_by_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -924,6 +1046,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_LAYOUT_QUOTE_MINT_OFFSET,
             quote_mint,
             base_mint,
+            zero_slice,
         );
         Box::pin(async move {
             let mut pools = spot_only.await?;
@@ -937,6 +1060,7 @@ pub trait DexRpcClientAsyncExt {
     fn get_all_futarchy_amm_pools_by_token(
         &self,
         token_mint: &Pubkey,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         let spot_only = self.get_pools_by_single_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -944,6 +1068,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_SPOT_BASE_MINT_OFFSET,
             FUTARCHY_SPOT_QUOTE_MINT_OFFSET,
             token_mint,
+            zero_slice,
         );
         let futarchy_layout = self.get_pools_by_single_token_offsets(
             FUTARCHY_AMM_PROGRAM_ID,
@@ -951,6 +1076,7 @@ pub trait DexRpcClientAsyncExt {
             FUTARCHY_LAYOUT_BASE_MINT_OFFSET,
             FUTARCHY_LAYOUT_QUOTE_MINT_OFFSET,
             token_mint,
+            zero_slice,
         );
         Box::pin(async move {
             let mut pools = spot_only.await?;
@@ -959,130 +1085,147 @@ pub trait DexRpcClientAsyncExt {
         })
     }
 
-    fn get_all_orca_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
-        self.get_all_pools_with_filters(ORCA_PROGRAM_ID, vec![memcmp_b58(DISC_ORCA_B58)])
+    fn get_all_orca_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+        self.get_all_pools_with_filters(ORCA_PROGRAM_ID, vec![memcmp_b58(DISC_ORCA_B58)], zero_slice)
     }
 
-    fn get_all_meteora_dlmm_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_meteora_dlmm_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             METEORA_DLMM_PROGRAM_ID,
             vec![memcmp_b58(DISC_METEORA_DLMM_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_meteora_damm_v2_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_meteora_damm_v2_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             METEORA_DAMM_V2_PROGRAM_ID,
             vec![memcmp_b58(DISC_METEORA_DAMM_V2_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_meteora_damm_v1_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_meteora_damm_v1_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             METEORA_DAMM_V1_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_METEORA_DAMM_V1_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_raydium_clmm_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_raydium_clmm_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             RAYDIUM_CLMM_PROGRAM_ID,
             vec![memcmp_b58(DISC_RAYDIUM_LIKE_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_pancake_swap_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_pancake_swap_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             PANCAKE_SWAP_PROGRAM_ID,
             vec![memcmp_b58(DISC_RAYDIUM_LIKE_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_pump_fun_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_pump_fun_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             PUMPFUN_AMM_PROGRAM_ID,
             vec![memcmp_b58(DISC_METEORA_DAMM_V2_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_raydium_cpmm_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_raydium_cpmm_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             RAYDIUM_CPMM_PROGRAM_ID,
             vec![memcmp_b58(DISC_RAYDIUM_LIKE_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_raydium_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_raydium_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             RAYDIUM_AMM_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_RAYDIUM_AMM_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_saros_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_saros_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             SAROS_SWAP_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_orca_v2_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_orca_v2_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             ORCA_V2_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_orca_v1_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_orca_v1_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             ORCA_V1_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_stepn_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_stepn_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             STEPN_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_token_swap_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_token_swap_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             TOKEN_SWAP_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_byreal_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_byreal_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             BYREAL_CLMM_PROGRAM_ID,
             vec![memcmp_b58(DISC_RAYDIUM_LIKE_B58)],
+            zero_slice,
         )
     }
 
-    fn get_all_fusion_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
-        self.get_all_pools_with_filters(FUSION_PROGRAM_ID, vec![memcmp_b58(DISC_FUSION_B58)])
+    fn get_all_fusion_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+        self.get_all_pools_with_filters(FUSION_PROGRAM_ID, vec![memcmp_b58(DISC_FUSION_B58)], zero_slice)
     }
 
-    fn get_all_obric_v2_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_obric_v2_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             OBRIC_V2_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_OBRIC_V2_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_futarchy_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_futarchy_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             FUTARCHY_AMM_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_FUTARCHY_BYTES)],
+            zero_slice,
         )
     }
 
-    fn get_all_penguin_amm_pools(&self) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
+    fn get_all_penguin_amm_pools(&self, zero_slice: bool) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
         self.get_all_pools_with_filters(
             PENGUIN_AMM_PROGRAM_ID,
             vec![memcmp_bytes(&DISC_TOKEN_SWAP_STYLE_BYTES)],
+            zero_slice,
         )
     }
 }
@@ -1093,8 +1236,9 @@ impl DexRpcClientAsyncExt for AsyncRpcClient {
         &self,
         program_id: Pubkey,
         filters: Vec<RpcFilterType>,
+        zero_slice: bool,
     ) -> BoxFuture<'_, ClientResult<ProgramAccounts>> {
-        let config = pool_fetch_config(filters);
+        let config = pool_fetch_config(filters, zero_slice);
         Box::pin(async move {
             self.get_program_ui_accounts_with_config(&program_id, config)
                 .await
